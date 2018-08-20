@@ -3,6 +3,7 @@
   <div class="w-screen h-screen flex items-center justify-center">
     <div class="app-calculator relative" v-if="operatorsList">
 
+      <!-- Loading State -->
       <div class="calculator-loading-state flex items-center justify-center absolute w-full h-full text-white font-bold" v-show="loading">
         calculating...
       </div>
@@ -15,7 +16,7 @@
       </div>
       <!-- end: Results -->
 
-      <!-- clear -->
+      <!-- clear & Top Operators -->
       <div class="flex h-10 w-full">
         <!-- Top Operators -->
         <ul class="flex list-reset" v-if="topOperators">
@@ -28,8 +29,11 @@
             </button>
           </li>
         </ul>
+        <!-- Clear -->
         <button class="calculator-button bg-orange text-white text-sm flex-1" @click="clear"> Clear </button>
       </div>
+      <!-- end: clear & Top Operators -->
+      
 
       <div class="flex">
         <!-- Left Operators -->
@@ -136,17 +140,22 @@ export default {
   methods:{
     calculate(operator){
 
+      let operation = operator.operation;
+
       this.isSecondOperand = true;
 
-      if(operator.operation !== 'equal')
-        this.operation = operator.operation;
+      if(operation !== 'equal')
+        this.operation = operation;
+
+      //avoid setting query, if operation requires 2 operators, but one is empty
+      if(operator.arguments === 2){
+        if(this.op1 ==='' || this.op2 === '')
+          return false;
+      }
 
       let query = this.setQuery(operator.arguments);
       this.loading = true;
-      this.$store.dispatch('getResult', query)
-        .then(() => { 
-          this.loading = false; 
-        });
+      this.$store.dispatch('getResult', query);
     },
     clear(){
       this.op1 = '';
@@ -161,10 +170,7 @@ export default {
     setQuery(numberOfArguments){
       switch(numberOfArguments) {
         case 2: 
-          if(this.op1 !=='' && this.op2 !== '')
-            return this.operation + '?op1=' + this.op1 + '&op2=' + this.op2;
-          else
-            return false;
+          return this.operation + '?op1=' + this.op1 + '&op2=' + this.op2;
           break;
         case 1:
           return this.operation + '?op1=' + this.op1;
@@ -189,10 +195,11 @@ export default {
   },
   watch: {
     result: function(val) {
-        this.op1 = this.result;
-        this.op2 = '';
-        this.isSecondOperand = false;
-        this.value = this.result;
+      this.op1 = this.result;
+      this.op2 = '';
+      this.isSecondOperand = false;
+      this.value = this.result;
+      this.loading = false;
     }
   }
 }
