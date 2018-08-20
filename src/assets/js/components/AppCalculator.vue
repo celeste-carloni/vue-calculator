@@ -23,7 +23,6 @@
             <button 
               class="calculator-button bg-grey-dark"
               @click="calculate(operator)"
-              :disabled="isBtnDisabled(operator.arguments)"
             > 
               {{operator.symbol}} 
             </button>
@@ -142,9 +141,6 @@ export default {
       if(operator.operation !== 'equal')
         this.operation = operator.operation;
 
-      if(this.op1 ==='' && this.op2 === '')
-        return false;
-
       let query = this.setQuery(operator.arguments);
       this.loading = true;
       this.$store.dispatch('getResult', query)
@@ -164,14 +160,17 @@ export default {
     },
     setQuery(numberOfArguments){
       switch(numberOfArguments) {
-        case 2:
-          return this.operation + '?op1=' + this.op1 + '&op2=' + this.op2;
+        case 2: 
+          if(this.op1 !=='' && this.op2 !== '')
+            return this.operation + '?op1=' + this.op1 + '&op2=' + this.op2;
+          else
+            return false;
           break;
         case 1:
           return this.operation + '?op1=' + this.op1;
           break;
         case 0:
-          return;
+          return this.operation;
           break;
         default:
           break;
