@@ -25,3 +25,8 @@ npm test
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+## TODO
+Validation for default case. Need to check:
+- what type of operator is
+- how many arguments are available

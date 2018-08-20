@@ -137,13 +137,13 @@ export default {
   methods:{
     calculate(operator){
 
-      let operation = operator.operation,
-        prevOperation = this.operation;
+      let prevOperation = this.operation;  
 
       this.isSecondOperand = true;
 
-      if(operation !== 'equal')
-        this.operation = operation;
+      //TODO: complete functionality
+      if(operator !== 'equal')
+        this.operation = operator.operation;
 
       if(operator.arguments === 2){
         if(this.op1 ==='' || this.op2 === '')
@@ -153,9 +153,8 @@ export default {
       }
 
       //send request
-      let query = this.setQuery(operator.arguments);
-      this.loading = true;
-      this.$store.dispatch('getResult', query);
+      this.sendQuery(operator.arguments);
+
     },
     clear(){
       this.op1 = '';
@@ -167,20 +166,26 @@ export default {
     isBtnDisabled(numberOfArguments){
       return numberOfArguments === 0
     },
-    setQuery(numberOfArguments){
+    sendQuery(numberOfArguments){
+      let query = '';
+
       switch(numberOfArguments) {
         case 2: 
-          return this.operation + '?op1=' + this.op1 + '&op2=' + this.op2;
+          query = this.operation + '?op1=' + this.op1 + '&op2=' + this.op2;
           break;
         case 1:
-          return this.operation + '?op1=' + this.op1;
+          query = this.operation + '?op1=' + this.op1;
           break;
         case 0:
-          return this.operation;
+          query = this.operation;
           break;
         default:
+          query = this.operation + '?op1=' + this.op1 + '&op2=' + this.op2; //TODO: this should be validated
           break;
       }
+
+      this.loading = true;
+      this.$store.dispatch('getResult', query);
     },
     setValue(n){
       if(this.isSecondOperand){

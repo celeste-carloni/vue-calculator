@@ -10,4 +10,5 @@ button:focus{
 
 button:disabled{
     @apply .cursor-not-allowed;
+    @apply .opacity-50;
 }
