@@ -1,0 +1,13 @@
+.calculator-button{
+    @apply .h-10 .w-10;
+    @apply .flex .items-center .justify-center;
+    @apply .border-2 .border-white;
+}
+
+button:focus{
+    outline: none;
+}
+
+button:disabled{
+    @apply .cursor-not-allowed;
+}
