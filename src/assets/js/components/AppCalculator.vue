@@ -22,8 +22,8 @@
           <li v-for="(operator,index) in topOperators" :key="index">
             <button 
               class="calculator-button bg-grey-dark"
-              @click="calculate(operator.operation)"
-              disabled
+              @click="calculate(operator)"
+              :disabled="isBtnDisabled(operator.arguments)"
             > 
               {{operator.symbol}} 
             </button>
@@ -39,8 +39,7 @@
             <li v-for="(operator,index) in leftOperators" :key="index">
               <button 
                 class="calculator-button bg-grey-dark"
-                @click="calculate(operator.operation)"
-                :disabled="isBtnDisabled(operator.operation)"
+                @click="calculate(operator)"
               > 
                 {{operator.symbol}} 
               </button>
@@ -78,7 +77,7 @@
         <div class="flex flex-col">
           <ul class="list-reset" v-if="rightOperators">
             <li v-for="operator in rightOperators" :key="operator.operation">
-              <button class="calculator-button bg-grey-dark" @click="calculate(operator.operation)"> 
+              <button class="calculator-button bg-grey-dark" @click="calculate(operator)"> 
                 {{operator.symbol}} 
               </button>
             </li>
@@ -136,17 +135,17 @@ export default {
     this.$store.dispatch('getOperators');
   },
   methods:{
-    calculate(operation){
+    calculate(operator){
 
       this.isSecondOperand = true;
 
-      if(operation !== 'equal')
-        this.operation = operation;
+      if(operator.operation !== 'equal')
+        this.operation = operator.operation;
 
-      if(this.op1 ==='' || this.op2 === '')
+      if(this.op1 ==='' && this.op2 === '')
         return false;
 
-      let query = this.operation + '?op1=' + this.op1 + '&op2=' + this.op2;
+      let query = this.setQuery(operator.arguments);
       this.loading = true;
       this.$store.dispatch('getResult', query)
         .then(() => { 
@@ -160,8 +159,23 @@ export default {
       this.isSecondOperand= false;
       this.value = 0;
     },
-    isBtnDisabled(operation){
-      return operation !== 'power'
+    isBtnDisabled(numberOfArguments){
+      return numberOfArguments === 0
+    },
+    setQuery(numberOfArguments){
+      switch(numberOfArguments) {
+        case 2:
+          return this.operation + '?op1=' + this.op1 + '&op2=' + this.op2;
+          break;
+        case 1:
+          return this.operation + '?op1=' + this.op1;
+          break;
+        case 0:
+          return;
+          break;
+        default:
+          break;
+      }
     },
     setValue(n){
       if(this.isSecondOperand){
