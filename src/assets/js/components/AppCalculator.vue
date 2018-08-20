@@ -118,9 +118,6 @@ export default {
        if(this.operatorsList){
         return this.operatorsList.slice( -2);
       }
-    },
-    showOp2(){
-      return this.isSecondOperand && this.op2.length > 0;
     }
   },
   data(){
@@ -140,19 +137,22 @@ export default {
   methods:{
     calculate(operator){
 
-      let operation = operator.operation;
+      let operation = operator.operation,
+        prevOperation = this.operation;
 
       this.isSecondOperand = true;
 
       if(operation !== 'equal')
         this.operation = operation;
 
-      //avoid setting query, if operation requires 2 operators, but one is empty
       if(operator.arguments === 2){
         if(this.op1 ==='' || this.op2 === '')
-          return false;
+          return false;  //avoid setting query, if operation requires 2 operators, but one is empty
+        else
+          this.operation = prevOperation;  //keep track of prev operator
       }
 
+      //send request
       let query = this.setQuery(operator.arguments);
       this.loading = true;
       this.$store.dispatch('getResult', query);
