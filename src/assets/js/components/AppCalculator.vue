@@ -136,25 +136,24 @@ export default {
   },
   methods:{
     calculate(operator){
-
-      let prevOperation = this.operation;  
+      const numberOfArguments = operator.arguments,
+        isInValid = this.isInValidOperation(operator);
 
       this.isSecondOperand = true;
 
-      //TODO: complete functionality
+      //keep track of prev operator
+      let prevOperation = this.operation; 
+
       if(operator !== 'equal')
         this.operation = operator.operation;
+      else
+        this.operation = prevOperation;
 
-      if(operator.arguments === 2){
-        if(this.op1 ==='' || this.op2 === '')
-          return false;  //avoid setting query, if operation requires 2 operators, but one is empty
-        else
-          this.operation = prevOperation;  //keep track of prev operator
-      }
+      if(isInValid)
+        return false;
 
       //send request
-      this.sendQuery(operator.arguments);
-
+      this.sendQuery(numberOfArguments);
     },
     clear(){
       this.op1 = '';
@@ -163,8 +162,27 @@ export default {
       this.isSecondOperand= false;
       this.value = 0;
     },
-    isBtnDisabled(numberOfArguments){
-      return numberOfArguments === 0
+    isInValidOperation(operator){
+      const numberOfArguments = operator.arguments;
+
+      switch(numberOfArguments) {
+        case 2: 
+          return this.op1 === '' || this.op2 === '';
+          break;
+        case 1:
+          return this.op1 === '';
+          break;
+        case 0:
+          return false;
+          break;
+        default:
+          if(operator === 'equal')
+            if(this.op1 === '' || this.op2 === '')
+            return true;
+          else
+            return false;
+          break;
+      }
     },
     sendQuery(numberOfArguments){
       let query = '';
@@ -180,7 +198,7 @@ export default {
           query = this.operation;
           break;
         default:
-          query = this.operation + '?op1=' + this.op1 + '&op2=' + this.op2; //TODO: this should be validated
+          query = this.operation + '?op1=' + this.op1 + '&op2=' + this.op2;
           break;
       }
 
